@@ -393,7 +393,13 @@ public class RecyclableBufferedInputStream extends FilterInputStream {
       pos = count;
       return read;
     }
-    return read + localIn.skip(byteCount - read);
+
+    // Skip all the bytes, ignoring the buffer. The mark position is now invalid, so reset it.
+    long skipped = localIn.skip(byteCount - read);
+    if (skipped > 0) {
+      markpos = -1;
+    }
+    return read + skipped;
   }
 
   /**
